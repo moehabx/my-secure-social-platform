@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+    background: rgba(255, 255, 255, 0.98);
+    padding: 3rem; /* Increased from 2.5rem */
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 40rem; /* Increased from 28rem */
+    min-height: 35rem; /* Ensures enough vertical space */
+    transition: transform 0.3s ease;
+}
+        .container:hover {
+            transform: translateY(-5px);
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            list-style: none;
+        }
+        .error li {
+            margin: 0.25rem 0;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(30, 58, 138, 0.4);
+        }
+        input {
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-3">Welcome</h1>
+        <h2 class="text-xl text-gray-700 mb-6">to Z - The most secure and reliable social media platform</h2>
+        <% if (errors && errors.length) { %>
+            <ul class="error">
+                <% errors.forEach(error => { %>
+                    <li><%= error %></li>
+                <% }) %>
+            </ul>
+        <% } %>
+        <form action="/register" method="POST" class="space-y-6">
+            <div>
+                <label for="username" class="block text-gray-700 font-medium mb-2">Username</label>
+                <input type="text" id="username" name="username" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <div>
+                <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
+                <input type="password" id="password" name="password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <button type="submit" class="btn-primary w-full">Register</button>
+        </form>
+        <a href="/login" class="text-blue-600 hover:text-blue-800 font-medium mt-4 inline-block transition-colors duration-300">Already have an account? Login</a>
+    </div>
+</body>
+</html>

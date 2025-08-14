@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold mb-4">Profile</h1>
+        <p class="text-lg mb-2">Username: <%= user.username %></p>
+        <h2 class="text-2xl font-semibold mb-2">Profile Picture</h2>
+        <img src="<%= user.profilePicture || '/default-profile.png' %>" alt="Profile Picture" class="profile-pic w-32 h-32 mb-4">
+        
+        <h3 class="text-xl font-semibold mb-2">Upload New Profile Picture</h3>
+        <% if (errors && errors.length) { %>
+            <ul class="error">
+                <% errors.forEach(error => { %>
+                    <li><%= error %></li>
+                <% }) %>
+            </ul>
+        <% } %>
+        <form action="/profile" method="POST" enctype="multipart/form-data" class="mb-4">
+            <input type="file" name="profilePicture" accept="image/jpeg,image/jpg,image/png,image/gif" class="mb-2">
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+        
+        <a href="/" class="text-blue-500 hover:underline">Back to Dashboard</a>
+    </div>
+</body>
+</html>

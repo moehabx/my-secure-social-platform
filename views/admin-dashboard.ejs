@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold mb-4">Admin Dashboard</h1>
+        <nav class="flex space-x-4 mb-4">
+            <a href="/" class="btn btn-primary">Back to Dashboard</a>
+            <a href="/logout" class="btn btn-danger">Logout</a>
+        </nav>
+
+        <% if (errors && errors.length) { %>
+            <ul class="error">
+                <% errors.forEach(error => { %>
+                    <li><%= error %></li>
+                <% }) %>
+            </ul>
+        <% } %>
+
+        <h2 class="text-2xl font-semibold mb-2">Manage Posts</h2>
+        <table class="mb-8">
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Profile Picture</th>
+                <th>Image</th>
+                <th>Likes</th>
+                <th>Actions</th>
+            </tr>
+            <% posts.forEach(post => { %>
+                <tr>
+                    <td><%= post.id %></td>
+                    <td><%= post.title %></td>
+                    <td><%= post.username %></td>
+                    <td><img src="<%= post.profilePicture || '/default-profile.png' %>" alt="Profile Picture" class="profile-pic w-10 h-10"></td>
+                    <td>
+                        <% if (post.image) { %>
+                            <img src="<%= post.image %>" alt="Post Image" class="post-image w-20">
+                        <% } else { %>
+                            -
+                        <% } %>
+                    </td>
+                    <td><%= post.likeCount %></td>
+                    <td>
+                        <form action="/delete-post/<%= post.id %>" method="POST">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        </table>
+
+        <h2 class="text-2xl font-semibold mb-2">Manage Users</h2>
+        <table class="mb-8">
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Admin</th>
+                <th>Profile Picture</th>
+                <th>Actions</th>
+            </tr>
+            <% users.forEach(user => { %>
+                <tr>
+                    <td><%= user.id %></td>
+                    <td><%= user.username %></td>
+                    <td><%= user.isAdmin ? 'Yes' : 'No' %></td>
+                    <td><img src="<%= user.profilePicture || '/default-profile.png' %>" alt="Profile Picture" class="profile-pic w-10 h-10"></td>
+                    <td>
+                        <form action="/admin/delete-user/<%= user.id %>" method="POST">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        </table>
+
+        <h2 class="text-2xl font-semibold mb-2">Manage Comments</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Content</th>
+                <th>Post</th>
+                <th>Author</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+            <% comments.forEach(comment => { %>
+                <tr>
+                    <td><%= comment.id %></td>
+                    <td><%= comment.content.substring(0, 50) %><%= comment.content.length > 50 ? '...' : '' %></td>
+                    <td><a href="/post/<%= comment.postId %>" class="text-blue-500 hover:underline"><%= comment.postTitle %></a></td>
+                    <td><%= comment.username %></td>
+                    <td><%= formatDate(comment.createdDate) %></td>
+                    <td>
+                        <form action="/delete-comment/<%= comment.id %>" method="POST">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        </table>
+    </div>
+</body>
+</html>

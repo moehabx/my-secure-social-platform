@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <!-- Include Tailwind CSS from CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* Custom styles to enhance Tailwind */
+        .chat-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .message.sent {
+            background-color: #93c5fd; /* Light blue for sent messages */
+            color: #1e293b; /* Dark gray text for contrast */
+        }
+        .message.received {
+            background-color: #e0f2fe; /* Very light blue for received messages */
+            color: #1e293b;
+        }
+        #chat-messages {
+            background-color: #ffffff; /* Pure white chat area */
+            border-radius: 8px;
+        }
+        .btn-primary {
+            background-color: #3b82f6; /* Rich blue button */
+            color: #ffffff;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container chat-container">
+        <h1 class="text-4xl font-bold text-white bg-blue-600 p-4 rounded-t-lg shadow-md mb-6">Chat</h1>
+        <div class="flex flex-col md:flex-row gap-6">
+            <div class="user-list w-full md:w-1/4 bg-white p-4 rounded-lg shadow-md">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Users</h3>
+                <ul class="space-y-2">
+                    <% if (users && users.length) { %>
+                        <% users.forEach(user => { %>
+                            <li class="mb-2">
+                                <a href="/chat/<%= user.id %>" class="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"><%= user.username %></a>
+                            </li>
+                        <% }) %>
+                    <% } else { %>
+                        <li class="text-gray-500">No other users available.</li>
+                    <% } %>
+                </ul>
+            </div>
+            <div class="chat-area w-full md:w-3/4 bg-white p-4 rounded-lg shadow-md">
+                <% if (typeof receiver !== 'undefined' && receiver) { %>
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Chatting with <%= receiver.username %></h3>
+                    <div id="chat-messages" class="h-96 overflow-y-auto border border-blue-200 p-4 mb-4 rounded-md">
+                        <% if (messages && messages.length) { %>
+                            <% messages.forEach(message => { %>
+                                <div class="message <%= message.senderId === user.userid ? 'sent' : 'received' %> mb-3 p-3 rounded-lg">
+                                    <strong class="text-blue-800"><%= message.senderUsername %>:</strong> <span class="text-gray-700"><%= message.content %></span>
+                                    <span class="text-xs text-gray-500 block mt-1"><%= new Date(message.createdDate).toLocaleString() %></span>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <p class="text-gray-500 text-center py-4">No messages yet.</p>
+                        <% } %>
+                    </div>
+                    <form id="chat-form" class="flex space-x-4">
+                        <input type="hidden" id="receiverId" value="<%= receiver.id %>">
+                        <textarea id="message-input" placeholder="Type your message..." class="w-full p-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                        <button type="submit" class="btn btn-primary px-6 py-3 rounded-lg font-semibold">Send</button>
+                    </form>
+                    <div id="chat-errors" class="mt-3"></div>
+                <% } else { %>
+                    <p class="text-gray-500 text-center py-6">Select a user from the list to start chatting.</p>
+                <% } %>
+            </div>
+        </div>
+        <a href="/" class="text-blue-600 hover:text-blue-800 font-medium mt-6 inline-block transition-colors duration-200">Back to Dashboard</a>
+    </div>
+    <!-- Include Socket.IO client from CDN -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        const userId = <%= user.userid %>; // Use EJS to safely inject user ID as number
+        const socket = io('/', {
+            auth: {
+                token: '<%= token %>' // Use server-provided token
+            }
+        });
+
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatErrors = document.getElementById('chat-errors');
+        const receiverIdInput = document.getElementById('receiverId');
+
+        socket.on('connect_error', (err) => {
+            console.error('Socket.IO connection error:', err.message);
+            chatErrors.innerHTML = `<p class="text-red-600">Connection error: ${err.message}</p>`;
+            setTimeout(() => chatErrors.innerHTML = '', 5000);
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Socket.IO disconnected');
+            chatErrors.innerHTML = `<p class="text-red-600">Disconnected. Reconnecting...</p>`;
+        });
+
+        socket.on('connect', () => {
+            console.log('Socket.IO connected');
+            chatErrors.innerHTML = `<p class="text-green-600">Connected to server.</p>`;
+            setTimeout(() => chatErrors.innerHTML = '', 3000);
+        });
+
+        if (chatForm) {
+            chatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const content = messageInput.value.trim();
+                const receiverId = receiverIdInput?.value;
+                if (content && receiverId) {
+                    console.log('Sending message:', { receiverId, content });
+                    socket.emit('chatMessage', { receiverId, content });
+                    messageInput.value = '';
+                } else {
+                    chatErrors.innerHTML = '<p class="text-red-600">Please enter a message and select a recipient.</p>';
+                    setTimeout(() => chatErrors.innerHTML = '', 5000);
+                }
+            });
+        }
+
+        socket.on('chatMessage', (message) => {
+            console.log('Received message:', message);
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', Number(message.senderId) === userId ? 'sent' : 'received', 'mb-3', 'p-3', 'rounded-lg');
+            messageDiv.innerHTML = `
+                <strong class="text-blue-800">${message.senderUsername}:</strong> <span class="text-gray-700">${message.content}</span>
+                <span class="text-xs text-gray-500 block mt-1">${new Date(message.createdDate).toLocaleString()}</span>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+
+        socket.on('chatError', (data) => {
+            console.log('Chat error:', data);
+            chatErrors.innerHTML = data.errors.map(error => `<p class="text-red-600">${error}</p>`).join('');
+            setTimeout(() => chatErrors.innerHTML = '', 5000);
+        });
+    </script>
+</body>
+</html>

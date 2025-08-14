@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold mb-4">Create Post</h1>
+        <% if (errors && errors.length) { %>
+            <ul class="error">
+                <% errors.forEach(error => { %>
+                    <li><%= error %></li>
+                <% }) %>
+            </ul>
+        <% } %>
+        <form action="/create-post" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <div>
+                <label for="title" class="block text-gray-700">Title</label>
+                <input type="text" id="title" name="title" class="w-full p-2 border rounded">
+            </div>
+            <div>
+                <label for="body" class="block text-gray-700">Body</label>
+                <textarea id="body" name="body" class="w-full p-2 border rounded" rows="5"></textarea>
+            </div>
+            <div>
+                <label for="postImage" class="block text-gray-700">Image (optional)</label>
+                <input type="file" id="postImage" name="postImage" accept="image/jpeg,image/jpg,image/png,image/gif">
+            </div>
+            <button type="submit" class="btn btn-primary">Create Post</button>
+        </form>
+        <a href="/" class="text-blue-500 hover:underline mt-4 inline-block">Back to Dashboard</a>
+    </div>
+</body>
+</html>

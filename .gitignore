@@ -1,0 +1,17 @@
+# # Node.js
+# node_modules/
+# npm-debug.log
+# yarn-error.log
+
+# # Environment variables
+# .env
+
+# # SQLite database
+# ourApp.db
+
+# # Uploads directory (user-uploaded images)
+# public/uploads/
+
+# # OS-specific files
+# .DS_Store
+# Thumbs.db
